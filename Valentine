@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine? 💘</title>
+
+  <style>
+    :root{
+      --bg1:#fff1f5;
+      --bg2:#ffe4ec;
+      --card:#ffffffcc;
+      --text:#111827;
+      --accent:#ff3b7a;
+      --dark:#111827;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(900px 600px at 15% 20%, var(--bg2), transparent 60%),
+        radial-gradient(900px 600px at 85% 80%, #e9d5ff, transparent 55%),
+        linear-gradient(135deg, var(--bg1), #fff);
+      overflow:hidden;
+      padding:24px;
+    }
+
+    .card{
+      width:min(680px, 92vw);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border-radius:22px;
+      padding:28px;
+      box-shadow: 0 20px 60px #00000014;
+      text-align:center;
+      position:relative;
+    }
+
+    h1{
+      font-size: clamp(26px, 4vw, 40px);
+      margin-bottom:12px;
+    }
+
+    .stage{
+      margin-top:20px;
+      position:relative;
+      height:130px;
+      border-radius:18px;
+      border:1px dashed #00000022;
+      background:#ffffffa6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 20px;
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .yes{
+      background: linear-gradient(135deg, var(--accent), #ff7aa6);
+      color:white;
+      margin-right:12px;
+      box-shadow: 0 14px 30px #ff3b7a2e;
+    }
+
+    .no{
+      background: var(--dark);
+      color:white;
+      position:absolute;
+      left:60%;
+      top:55%;
+      transform:translate(-50%,-50%);
+      white-space:nowrap;
+    }
+
+    .result{
+      margin-top:20px;
+      display:none;
+      font-size:22px;
+      font-weight:900;
+      color:#ff3b7a;
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:none;
+    }
+    .confetti span{
+      position:absolute;
+      top:-10vh;
+      font-size:20px;
+      animation:fall 1.6s linear forwards;
+    }
+    @keyframes fall{
+      to{
+        transform:translateY(120vh) rotate(360deg);
+        opacity:0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>Hej Dicle, vil du være min valentine? 💘</h1>
+
+    <div class="stage" id="stage">
+      <button class="yes" id="yesBtn">Ja 💖</button>
+      <button class="no" id="noBtn">Nej</button>
+    </div>
+
+    <div class="result" id="result">Yaaaay, jeg elsker dig 🥰💘</div>
+  </main>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    const stage = document.getElementById("stage");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const result = document.getElementById("result");
+    const confetti = document.getElementById("confetti");
+
+    function moveNo(){
+      const s = stage.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      const x = Math.random() * (s.width - b.width);
+      const y = Math.random() * (s.height - b.height);
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+      noBtn.style.transform = "none";
+    }
+
+    noBtn.addEventListener("mouseenter", moveNo);
+    noBtn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      moveNo();
+    });
+
+    function launchConfetti(){
+      confetti.innerHTML = "";
+      confetti.style.display = "block";
+      const emojis = ["💖","💘","💝","❤️","🥰"];
+      for(let i=0;i<70;i++){
+        const s = document.createElement("span");
+        s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        s.style.left = Math.random()*100 + "vw";
+        s.style.animationDelay = Math.random()*300 + "ms";
+        confetti.appendChild(s);
+      }
+      setTimeout(()=>confetti.style.display="none",1800);
+    }
+
+    yesBtn.addEventListener("click", ()=>{
+      result.style.display="block";
+      noBtn.style.display="none";
+      yesBtn.disabled = true;
+      launchConfetti();
+    });
+
+    setTimeout(moveNo, 400);
+  </script>
+</body>
+</html>
