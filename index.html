@@ -3,167 +3,481 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Valentine 💘</title>
-
+  <title>Til Dicle 💘</title>
   <style>
+    :root{
+      --bg1:#fff1f5;
+      --bg2:#ffe4ec;
+      --card:#ffffffcc;
+      --text:#111827;
+      --accent:#ff3b7a;
+      --accent2:#7c3aed;
+      --dark:#111827;
+    }
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      min-height:100svh;
+      display:grid;
+      place-items:center;
       background:
-        radial-gradient(circle at top left, #ffe4ec, transparent 60%),
-        radial-gradient(circle at bottom right, #e9d5ff, transparent 60%),
-        #fff1f5;
+        radial-gradient(900px 600px at 15% 20%, var(--bg2), transparent 60%),
+        radial-gradient(900px 600px at 85% 80%, #e9d5ff, transparent 55%),
+        linear-gradient(135deg, var(--bg1), #fff);
       overflow:hidden;
+      padding:24px;
+      color:var(--text);
     }
 
+    /* floating hearts bg */
+    .float-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+    .float-heart{
+      position:absolute; bottom:-20px; opacity:.55;
+      animation: rise linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.08));
+    }
+    @keyframes rise{ to{ transform: translateY(-120vh) rotate(260deg); opacity:0; } }
+
     .card{
-      background:rgba(255,255,255,0.9);
-      padding:30px;
+      width:min(820px, 95vw);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid #ffffffaa;
       border-radius:22px;
-      text-align:center;
-      box-shadow:0 20px 60px rgba(0,0,0,0.15);
-      width:min(90vw, 600px);
+      padding:20px;
+      box-shadow: 0 20px 60px #00000014;
+      position:relative;
+      overflow:hidden;
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid #00000010;
+      background:#ffffffb8;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    .progress{
+      flex:1; height:10px; border-radius:999px;
+      background:#00000010; overflow:hidden; min-width:120px;
+    }
+    .bar{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius:999px;
+      transition: width .35s ease;
     }
 
     h1{
-      font-size:clamp(24px, 4vw, 38px);
-      margin-bottom:20px;
+      margin:10px 0 6px;
+      font-size: clamp(24px, 3.6vw, 40px);
+      letter-spacing:-.02em;
+    }
+    p{margin:8px 0 0; line-height:1.55; font-size:16px; opacity:.9}
+
+    .panel{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px dashed #00000022;
+      background:#ffffffa6;
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .question{ font-weight:1000; font-size:18px; margin-bottom:10px; }
+    .choices{ display:flex; flex-wrap:wrap; gap:10px; }
+
+    button{
+      border:0; border-radius:14px;
+      padding:12px 14px;
+      font-weight:900; cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+      user-select:none; -webkit-tap-highlight-color: transparent;
+    }
+    button:active{transform: scale(.98)}
+    .primary{
+      background: linear-gradient(135deg, var(--accent), #ff7aa6);
+      color:white; box-shadow: 0 14px 30px #ff3b7a2e;
+    }
+    .secondary{
+      background: linear-gradient(135deg, var(--accent2), #a78bfa);
+      color:white; box-shadow: 0 14px 30px #7c3aed22;
+    }
+    .ghost{
+      background:#ffffff;
+      border:1px solid #00000014;
     }
 
+    .sweet{
+      margin-top:10px;
+      font-size:13px;
+      opacity:.85;
+      padding:10px 12px;
+      border-radius:14px;
+      background:#ffffffb8;
+      border:1px solid #00000010;
+    }
+
+    /* Stage for yes/no */
     .stage{
       position:relative;
-      height:130px;
+      height:120px;
       border-radius:18px;
-      border:1px dashed #ccc;
+      border:1px dashed #00000022;
+      background:#ffffffa6;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#fff;
       overflow:hidden;
+      margin-top:12px;
     }
-
-    button{
-      border:none;
-      border-radius:14px;
-      padding:12px 20px;
-      font-weight:800;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .yes{
-      background:linear-gradient(135deg, #ff3b7a, #ff7aa6);
-      color:white;
-      margin-right:12px;
-    }
-
     .no{
-      background:#111827;
+      background: var(--dark);
       color:white;
       position:absolute;
       left:60%;
       top:55%;
       transform:translate(-50%,-50%);
       white-space:nowrap;
+      box-shadow: 0 14px 30px #11182722;
+    }
+
+    /* “Kram-meter” */
+    .meterWrap{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+      opacity:.9;
+    }
+    .meter{
+      flex:1;
+      height:10px;
+      border-radius:999px;
+      background:#00000010;
+      overflow:hidden;
+    }
+    .meter > div{
+      width:0%;
+      height:100%;
+      background: linear-gradient(90deg, #ff3b7a, #7c3aed);
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+
+    .summary{
+      margin-top:12px;
+      display:none;
+      flex-wrap:wrap;
+      gap:10px;
+      font-size:14px;
+      opacity:.9;
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      background:#ffffffb8;
+      border:1px solid #00000010;
     }
 
     .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      background:#0f172a;
+      color:#fff;
       display:none;
-      margin-top:20px;
-      font-size:22px;
+      font-size:18px;
       font-weight:900;
-      color:#ff3b7a;
     }
 
-    /* Confetti */
-    .confetti{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      display:none;
-    }
+    /* confetti */
+    .confetti{ position:fixed; inset:0; pointer-events:none; display:none; }
     .confetti span{
-      position:absolute;
-      top:-10vh;
-      font-size:22px;
-      animation:fall 1.6s linear forwards;
+      position:absolute; top:-10vh; font-size:22px;
+      animation:fall 1.7s linear forwards;
     }
-    @keyframes fall{
-      to{
-        transform:translateY(120vh) rotate(360deg);
-        opacity:0;
-      }
-    }
+    @keyframes fall{ to{ transform:translateY(120vh) rotate(420deg); opacity:0; } }
+
+    .tiny{ margin-top:10px; font-size:12px; opacity:.65; }
   </style>
 </head>
 
 <body>
+  <div class="float-layer" id="floatLayer" aria-hidden="true"></div>
 
-  <div class="card">
-    <h1>Hej Dicle, vil du være min valentine? 💘</h1>
-
-    <div class="stage" id="stage">
-      <button class="yes" id="yesBtn">Ja 💖</button>
-      <button class="no" id="noBtn">Nej</button>
+  <main class="card">
+    <div class="top">
+      <div class="badge"><span class="dot"></span> Dicle x Firat — Valentine Mission 💘</div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
     </div>
 
-    <div class="result" id="result">
-      Yaaaay, jeg elsker dig 🥰💘
-    </div>
-  </div>
+    <h1 id="title">Hej Dicle, vil du være min valentine? 💘</h1>
+    <p id="subtitle">Okay… før du svarer: mini-quiz. (meget seriøs… måske)</p>
 
-  <div class="confetti" id="confetti"></div>
+    <div class="meterWrap">
+      <div>🤗 Kram-meter:</div>
+      <div class="meter"><div id="meterBar"></div></div>
+      <div id="meterText">0%</div>
+    </div>
+
+    <section class="panel" id="panel"></section>
+
+    <div class="summary" id="summary"></div>
+    <div class="result" id="result"></div>
+
+    <div class="tiny" id="tinyHint">Tip: “Nej” er kun med som statist. Den stikker af.</div>
+  </main>
+
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
 
   <script>
-    const stage = document.getElementById("stage");
-    const noBtn = document.getElementById("noBtn");
-    const yesBtn = document.getElementById("yesBtn");
-    const result = document.getElementById("result");
-    const confetti = document.getElementById("confetti");
+    const $ = (id) => document.getElementById(id);
+    const panel = $("panel");
+    const bar = $("bar");
+    const meterBar = $("meterBar");
+    const meterText = $("meterText");
+    const summary = $("summary");
+    const result = $("result");
+    const confetti = $("confetti");
+    const floatLayer = $("floatLayer");
 
-    function moveNo(){
-      const s = stage.getBoundingClientRect();
-      const b = noBtn.getBoundingClientRect();
-      const x = Math.random() * (s.width - b.width);
-      const y = Math.random() * (s.height - b.height);
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-      noBtn.style.transform = "none";
+    const answers = { vibe:null, snack:null, vibe2:null };
+    let step = 0;
+    const totalSteps = 4;
+
+    const compliments = [
+      "Fun fact: du gør alt pænere bare ved at være der 🥰",
+      "Jeg har seriøst verdens flotteste valentine-kandidat 😌💘",
+      "Hvis sød var en person… ja, så var det dig 🍯",
+      "Jeg lover at grine af dine jokes… og mine egne 😄"
+    ];
+
+    // Floating hearts background
+    const floatEmojis = ["💖","💘","❤️","💝","🥰","✨"];
+    function spawnFloat(){
+      const s = document.createElement("div");
+      s.className = "float-heart";
+      s.textContent = floatEmojis[Math.floor(Math.random()*floatEmojis.length)];
+      s.style.left = (Math.random()*100) + "vw";
+      const dur = 3500 + Math.random()*3500;
+      s.style.animationDuration = dur + "ms";
+      s.style.fontSize = (14 + Math.random()*18) + "px";
+      floatLayer.appendChild(s);
+      setTimeout(()=> s.remove(), dur);
     }
+    setInterval(spawnFloat, 420);
 
-    noBtn.addEventListener("mouseenter", moveNo);
-    noBtn.addEventListener("touchstart", e => {
-      e.preventDefault();
-      moveNo();
-    });
-
-    function launchConfetti(){
+    // Confetti
+    function boom(){
       confetti.innerHTML = "";
       confetti.style.display = "block";
-      const hearts = ["💖","💘","❤️","💝","🥰"];
-      for(let i=0;i<60;i++){
+      const emojis = ["💖","💘","❤️","💝","🥰","✨","🎉"];
+      for(let i=0;i<85;i++){
         const s = document.createElement("span");
-        s.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+        s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
         s.style.left = Math.random()*100 + "vw";
-        s.style.animationDelay = Math.random()*300 + "ms";
+        s.style.animationDelay = Math.random()*250 + "ms";
         confetti.appendChild(s);
       }
-      setTimeout(()=>confetti.style.display="none",1800);
+      setTimeout(()=> confetti.style.display="none", 1900);
     }
 
-    yesBtn.addEventListener("click", ()=>{
-      result.style.display = "block";
-      noBtn.style.display = "none";
-      yesBtn.disabled = true;
-      launchConfetti();
-    });
+    function setProgress(){
+      bar.style.width = Math.round((step/totalSteps)*100) + "%";
+      const hug = Math.min(100, Math.round((step/totalSteps)*100));
+      meterBar.style.width = hug + "%";
+      meterText.textContent = hug + "%";
+    }
 
-    setTimeout(moveNo, 400);
+    function renderSummary(){
+      const a = answers;
+      const parts = [];
+      if(a.vibe) parts.push(`<div class="pill">Vibe: <strong>${a.vibe}</strong></div>`);
+      if(a.snack) parts.push(`<div class="pill">Snack: <strong>${a.snack}</strong></div>`);
+      if(a.vibe2) parts.push(`<div class="pill">Mood: <strong>${a.vibe2}</strong></div>`);
+      summary.innerHTML = parts.join("");
+      summary.style.display = parts.length ? "flex" : "none";
+    }
+
+    function sweetLine(){
+      const text = compliments[Math.floor(Math.random()*compliments.length)];
+      return `<div class="sweet">💌 ${text}</div>`;
+    }
+
+    function render(){
+      setProgress();
+      renderSummary();
+
+      if(step === 0){
+        panel.innerHTML = `
+          <div class="question">Spørgsmål 1/4: Hvad er den perfekte date-vibe?</div>
+          <div class="choices">
+            <button class="primary" data-v="Pizza + film 🍕🎬">Pizza + film 🍕🎬</button>
+            <button class="secondary" data-v="Middag + gåtur 🍽️🚶‍♀️">Middag + gåtur 🍽️🚶‍♀️</button>
+            <button class="ghost" data-v="Hjemmehygge deluxe 🕯️🫶">Hjemmehygge deluxe 🕯️🫶</button>
+            <button class="ghost" data-v="Du bestemmer (jeg siger ja) 😇">Du bestemmer 😇</button>
+          </div>
+          ${sweetLine()}
+        `;
+        panel.querySelectorAll("button").forEach(b=>{
+          b.addEventListener("click", ()=>{
+            answers.vibe = b.getAttribute("data-v");
+            step = 1; boom(); render();
+          });
+        });
+        return;
+      }
+
+      if(step === 1){
+        panel.innerHTML = `
+          <div class="question">Spørgsmål 2/4: Hvilken snack skal jeg sørge for?</div>
+          <div class="choices">
+            <button class="primary" data-s="Chokolade 🍫">Chokolade 🍫</button>
+            <button class="secondary" data-s="Jordbær 🍓">Jordbær 🍓</button>
+            <button class="ghost" data-s="Popcorn 🍿">Popcorn 🍿</button>
+            <button class="ghost" data-s="Alt (ja tak) 😄">Alt 😄</button>
+          </div>
+          ${sweetLine()}
+        `;
+        panel.querySelectorAll("button").forEach(b=>{
+          b.addEventListener("click", ()=>{
+            answers.snack = b.getAttribute("data-s");
+            step = 2; boom(); render();
+          });
+        });
+        return;
+      }
+
+      if(step === 2){
+        panel.innerHTML = `
+          <div class="question">Spørgsmål 3/4: Vælg “mood” for aftenen 😏</div>
+          <div class="choices">
+            <button class="primary" data-m="Sød & romantisk 🥰">Sød & romantisk 🥰</button>
+            <button class="secondary" data-m="Sjov & drilsk 😄">Sjov & drilsk 😄</button>
+            <button class="ghost" data-m="Lidt af det hele 💘">Lidt af det hele 💘</button>
+            <button class="ghost" data-m="Du er mooden 😌">Du er mooden 😌</button>
+          </div>
+          ${sweetLine()}
+        `;
+        panel.querySelectorAll("button").forEach(b=>{
+          b.addEventListener("click", ()=>{
+            answers.vibe2 = b.getAttribute("data-m");
+            step = 3; boom(); render();
+          });
+        });
+        return;
+      }
+
+      if(step === 3){
+        panel.innerHTML = `
+          <div class="question">Spørgsmål 4/4: Okay… nu kommer det seriøse 😳</div>
+          <div class="tiny" style="margin-bottom:10px">
+            Du valgte: <strong>${answers.vibe}</strong> + <strong>${answers.snack}</strong> — mood: <strong>${answers.vibe2}</strong>
+          </div>
+
+          <div class="stage" id="stage">
+            <button class="primary" id="yesBtn">JA 💖</button>
+            <button class="no" id="noBtn" type="button">Nej</button>
+          </div>
+
+          <div class="tiny">PS: “Nej” er kun med for drama. Den stikker af.</div>
+          ${sweetLine()}
+        `;
+
+        const stageEl = $("stage");
+        const noBtn = $("noBtn");
+        const yesBtn = $("yesBtn");
+
+        let dodges = 0;
+        const noLines = [
+          "Nej",
+          "Nej? 😅",
+          "Ejj kom nu 🙈",
+          "Det var tæt på!",
+          "Nice try 😏",
+          "Jeg kan ikke…",
+          "Stop 😂",
+          "Okay okay… men nej?",
+          "HAHA nej.",
+          "…du får mig ikke 😤"
+        ];
+
+        function moveNo(){
+          const s = stageEl.getBoundingClientRect();
+          const b = noBtn.getBoundingClientRect();
+          const x = Math.random() * (s.width - b.width);
+          const y = Math.random() * (s.height - b.height);
+          noBtn.style.left = x + "px";
+          noBtn.style.top = y + "px";
+          noBtn.style.transform = "none";
+        }
+
+        function troll(){
+          dodges++;
+          noBtn.textContent = noLines[Math.min(noLines.length-1, dodges)];
+          stageEl.animate(
+            [{transform:"translateY(0)"},{transform:"translateY(-2px)"},{transform:"translateY(2px)"},{transform:"translateY(0)"}],
+            {duration:180}
+          );
+          // give extra confetti sometimes
+          if(dodges === 3 || dodges === 6) boom();
+        }
+
+        noBtn.addEventListener("mouseenter", ()=>{ moveNo(); troll(); });
+        noBtn.addEventListener("touchstart", (e)=>{
+          e.preventDefault();
+          moveNo(); troll();
+        }, {passive:false});
+        noBtn.addEventListener("click", (e)=>{
+          e.preventDefault();
+          moveNo(); troll();
+        });
+
+        yesBtn.addEventListener("click", ()=>{
+          step = 4;
+          setProgress();
+          boom();
+          $("title").textContent = "Yaaaay, jeg elsker dig 🥰💘";
+          $("subtitle").textContent = "Valentine aftale: accepteret ✅ (og jeg glæder mig allerede)";
+          panel.style.display = "none";
+          $("tinyHint").style.display = "none";
+
+          result.style.display = "block";
+          result.innerHTML = `
+            <div style="font-size:20px; font-weight:1000; margin-bottom:8px;">
+              Yaaaay, jeg elsker dig 🥰💘
+            </div>
+            <div style="font-weight:800; opacity:.95; line-height:1.55">
+              <div>✨ Plan: <strong>${answers.vibe}</strong></div>
+              <div>🍓 Snack: <strong>${answers.snack}</strong></div>
+              <div>💘 Mood: <strong>${answers.vibe2}</strong></div>
+              <br/>
+              <div>📌 Aftale: Du møder op og er sød. Jeg sørger for resten.</div>
+              <div style="opacity:.85; margin-top:8px;">(Og ja… jeg giver et kram som startbonus 🤗)</div>
+            </div>
+          `;
+        });
+
+        setTimeout(moveNo, 350);
+        return;
+      }
+    }
+
+    render();
   </script>
-
 </body>
 </html>
